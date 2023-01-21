@@ -26,7 +26,6 @@
       'dpkg',
       'fakeroot',
       'gcc-multilib',
-      'gcc-mingw-w64', # for windows problems
       'iptables-persistent',
       'libffi-dev',
       'libssl-dev',

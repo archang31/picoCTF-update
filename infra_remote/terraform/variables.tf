@@ -17,7 +17,7 @@ locals {
   shared_credentials_files = ["~/.aws/credentials"]
 
   # SSH Settings: local path to key that will be authorized on the machines
-  public_key_path = "~/.ssh/picoCTF_production_rsa.pub"
+  public_key_path = "~/.ssh/picoCTF_production.pub"
 
   # Machine Instance Type
   web_instance_type   = "t2.micro"
@@ -77,7 +77,7 @@ data "aws_ami" "ubuntu" {
   # pinned to a specific release to prevent drift
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200430"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }
 
   filter {
