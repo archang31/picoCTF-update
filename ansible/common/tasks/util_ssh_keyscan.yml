@@ -33,3 +33,14 @@
     create: yes
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan -trsa -H ' + ansible_host ) }}"
+
+# reference: https://gist.github.com/shirou/6928012
+- name: Ensure ssh host key known
+  become: false
+  local_action:
+    module: lineinfile
+    dest: ~/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -trsa -H ' + ip_response.content ) }}"
+  when: host_type == "DNS"

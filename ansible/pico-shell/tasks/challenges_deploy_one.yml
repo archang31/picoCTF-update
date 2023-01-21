@@ -1,0 +1,50 @@
+---
+# development convenience to install/deploy a single challenge
+# expects:
+#   slug        (e.g. docker-world-867a1ac)
+#   problem_dir (e.g. /picoCTF/problems/examples/on-demand/minimal/)
+# optional:
+#   deploy_number (defaults to 2)
+
+# make sure the problem directory exists and you can get a valid slug from problem.json
+- name: Verify problem directory real and 'problem.json' exists
+  stat:
+    path: "{{ problems_base_dir }}/{{ problem_dir }}/problem.json"
+  register: reinstall_problem_dir
+
+- name: Fail this playbook if directory and problem.json does not exist
+  fail:
+    msg: Problem directory {{ problem_dir }} is not valid
+  when: reinstall_problem_dir.stat.exists == false
+
+- name: Getting slug from ({{ problem_dir }})
+  command: "{{ virtualenv_dir }}/bin/shell_manager status -d {{ problems_base_dir }}/{{ problem_dir }}"
+  register: status_output
+
+- name: Registered problem unique name as slug
+  set_fact:
+    slug: "{{ status_output.stdout }}"
+
+- name: Fail this playbook if slug does not exist
+  fail:
+    msg: Problem directory {{ problem_dir }} does not produce a valid slug
+  when: slug|length == 0
+
+# now check to see if previously installed. If so, suggest using redeploy
+- name: Check to see if {{ slug }} installed (does not matter if deployed)
+  shell:
+    cmd: |
+      shell_manager status | grep "{{ slug }}" | awk -F'[()]' '{print $2}'
+  register: slug_test
+
+- name: Fail this playbook if the slug is installed
+  fail:
+    msg: Problem {{ slug }} is installed - did you mean to redeploy instead of deploy?
+  when: slug_test.stdout_lines|length != 0
+
+# Finally, install and deploy the problem
+- name: Installing problem ({{ problem_dir }})
+  command: "shell_manager install {{ problems_base_dir }}/{{ problem_dir }}"
+
+- name: Deploying problem ({{slug}})
+  command: "shell_manager deploy -n {{deploy_number}} {{slug}}"

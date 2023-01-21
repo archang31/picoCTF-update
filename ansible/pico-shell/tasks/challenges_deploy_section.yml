@@ -1,0 +1,21 @@
+---
+# development convenience to undeploy/redeploy a section (entire problem directory)
+# expects:
+#   problem_dir (e.g. /picoCTF/problems/examples/on-demand/)
+# requires:
+#   pid.txt (e.g. /picoCTF/problems/examples/on-demand/pids.txt)
+# optional:
+#   deploy_number (defaults to 2)
+
+- name: Install revised problems ({{problem_dir}})
+  command: "shell_manager install {{ problems_base_dir }}/{{problem_dir}}"
+
+- name: Get Section Problems (PIDs)
+  shell:
+    cmd: |
+      cat {{ problems_base_dir }}/{{problem_dir}}/pids.txt
+  register: section_pids
+
+- name: Redeploy revised problem
+  command: "shell_manager deploy -n {{deploy_number}} {{item}}"
+  with_items: "{{ section_pids.stdout_lines }}"

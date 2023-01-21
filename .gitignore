@@ -6,15 +6,27 @@
 site.retry
 node_modules/
 package-lock.json
+/secrets
 
 # Fetched contents from hosts
 certs
 keys
+database_backups
 
 # ansible-vault files
 vault_pass.txt
-vault.yml
+vault_backup_pass.txt
 
 # terraform state
 .terraform
 *terraform.tfstate*
+.terraform.lock.hcl
+
+# MAC OS
+*.DS_Store
+
+# Py cache
+*__pycache__*
+
+# vscode
+.vscode*

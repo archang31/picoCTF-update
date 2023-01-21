@@ -26,6 +26,7 @@
       'dpkg',
       'fakeroot',
       'gcc-multilib',
+      'gcc-mingw-w64', # for windows problems
       'iptables-persistent',
       'libffi-dev',
       'libssl-dev',
@@ -78,15 +79,26 @@
       - cryptography==3.3.2
       - requests==2.22.0
 
+## markupsafe and itsdangerous 2.0.1 required on both shell and web due to issues with
+## a ton of packages (Jinja, Flask, etc.) since 'soft_unicode' was removed from MarkUpSafe
+## https://markupsafe.palletsprojects.com/en/2.1.x/changes/#version-2-1-0
+## This might get fixed but, for now, the easy answer is to pin to version 2.0.1
+
 - name: Install python packaging in (new) virtualenv
   pip:
-    name: packaging
+    name: 
+      - packaging
+      - markupsafe==2.0.1
+      - itsdangerous==2.0.1
     virtualenv: "{{ virtualenv_dir }}"
     virtualenv_python: python3.7
 
 - name: Install python appdirs
   pip:
-    name: appdirs
+    name: 
+      - appdirs
+      - markupsafe==2.0.1
+      - itsdangerous==2.0.1
     virtualenv: "{{ virtualenv_dir }}"
 
 # Fix https://github.com/picoCTF/picoCTF/issues/150
@@ -202,7 +214,6 @@
     production: yes
     global: no
     path: /opt/wetty
-    version: "2.0.2"
 
 - name: Install quota
   apt:

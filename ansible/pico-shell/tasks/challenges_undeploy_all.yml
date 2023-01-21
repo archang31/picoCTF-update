@@ -1,0 +1,32 @@
+---
+# development convenience to undeploy and uninstall all problems and bundles
+# example:
+#   ansible-playbook site.yml --tags uninstall_all
+# optional:
+#   deploy_number (defaults to 2)
+
+- name: Getting all installed bundles
+  shell:
+    cmd: |
+      shell_manager status | grep "\-bundle" | awk -F'[()]' '{print $2}'
+  register: installed_bundles
+
+- name: Uninstalling all bundles
+  command: "shell_manager uninstall-bundle {{item}}"
+  with_items: "{{ installed_bundles.stdout_lines }}"
+
+- name: Undeploying all deployed problems
+  command: "shell_manager undeploy all -n {{deploy_number}}"
+
+- name: Getting all installed problems
+  shell:
+    cmd: |
+      shell_manager status | grep "* \[" | awk -F'[()]' '{print $2}'
+  register: installed_problems
+
+- name: Uninstalling all installed problems
+  command: "shell_manager uninstall {{item}}"
+  with_items: "{{ installed_problems.stdout_lines }}"
+
+- name: Cleaning shell_manager
+  command: "shell_manager clean"

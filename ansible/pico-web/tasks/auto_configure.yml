@@ -14,6 +14,9 @@
     web_email : "{{ admin_email }}"
   when: auto_add_web_admin
 
+- include: auto_add_management_settings.yml
+  when: auto_add_management_settings
+
 - include: auto_add_shell.yml
   when: auto_add_shell
 
@@ -21,4 +24,10 @@
 - include: auto_load_deployment.yml
   when: auto_load_problems or (slug is defined and problem_dir is defined)
   tags:
+    - deploy-one
+    - deploy-section
+    - deploy-all
     - redeploy-one
+    - redeploy-all
+    - redeploy-section
+    - flush-and-reload-db

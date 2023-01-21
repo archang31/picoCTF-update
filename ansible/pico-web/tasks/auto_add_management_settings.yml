@@ -1,0 +1,48 @@
+---
+# Task list to auto add various management settings
+
+- name: Autoload Competition General Settings
+  shell:
+    cmd: >
+      . {{virtualenv_dir}}/bin/activate;
+      {{ scripts_dir }}/add-general-settings.py
+      --competition_name "{{competition_name}}"
+      --competition_url "{{competition_url}}"
+      --max_team_size {{max_team_size}}
+  register: result
+  changed_when: '"WARN" not in result.stderr'
+
+- name: Autoload Email Settings into web interface
+  shell:
+    cmd: >
+      . {{virtualenv_dir}}/bin/activate;
+      {{ scripts_dir }}/add-email.py
+      --enable_email {{enable_email}}
+      --email_verification {{email_verification}}
+      --parent_verification_email {{parent_verification_email}}
+      --smtp_url "{{smtp_url}}"
+      --smtp_port {{smtp_port}}
+      --email_username "{{email_username}}"
+      --email_password "{{email_password}}"
+      --from_addr "{{email_from_addr}}"
+      --from_name "{{email_from_name}}"
+      --max_verification_emails {{max_verification_emails}}
+      --smtp_security "{{smtp_security}}"
+  when: enable_email
+  register: result
+  changed_when: '"WARN" not in result.stderr'
+
+- name: Autoload reCAPTCHA Settings into web interface
+  shell:
+    cmd: >
+      . {{virtualenv_dir}}/bin/activate;
+      {{ scripts_dir }}/add-recaptcha.py
+      --enable_captcha {{enable_captcha}}
+      --captcha_url "{{captcha_url}}"
+      --reCAPTCHA_public_key "{{reCAPTCHA_public_key}}"
+      --reCAPTCHA_private_key "{{reCAPTCHA_private_key}}"
+  when: enable_captcha
+  register: result
+  changed_when: '"WARN" not in result.stderr'
+
+#- debug: var=result.stdout_lines

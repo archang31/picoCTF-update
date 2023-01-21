@@ -1,0 +1,12 @@
+---
+# Playbook to reboot the server if needed after installing dependencies and updates
+
+- name: Checking to see if a reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot
+
+- name: Reboot since required
+  reboot:
+    msg: "Rebooting to install required system updates."
+  when: reboot.stat.exists == true

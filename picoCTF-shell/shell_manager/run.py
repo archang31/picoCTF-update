@@ -182,6 +182,13 @@ def main():
         action="store_true",
         help="Only print problems with failing service status.",
     )
+    status_parser.add_argument(
+    "-d",
+    "--problem_dir",
+    type=str,
+    default=None,
+    help="Get unique name from a problem directory.",
+    )
     status_parser.set_defaults(func=status)
 
     clean_parser = subparsers.add_parser("clean", help="clean up problem staging data")

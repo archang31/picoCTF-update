@@ -221,6 +221,12 @@ def status(args):
             print(json.dumps(get_bundle_status(bundle), indent=4))
         else:
             print_bundle(bundle, args.bundle, prefix="")
+    elif args.problem_dir is not None:
+        problem = get_problem(args.problem_dir)
+        if problem is None:
+            print('Could not find problem "{}"'.format(args.problem_dir))
+            return
+        print(problem['unique_name'])
 
     else:
         return_code = 0
@@ -244,11 +250,13 @@ def status(args):
         else:
             print("** Installed Bundles [{}] **".format(len(bundles)))
             shown_problems = []
-            for path, bundle in bundles.items():
+            # adding sorting so displayed in alphabetical order
+            for path, bundle in sorted(bundles.items(), key=lambda x: x[1]['name']):
                 print_bundle(bundle, path, prefix="  ")
 
             print("** Installed Problems [{}] **".format(len(problems)))
-            for path, problem in problems.items():
+            # adding sorting so displayed in alphabetical order
+            for path, problem in sorted(problems.items(), key=lambda x: x[1]['name']):
                 problem_status = get_problem_status(path, problem)
 
                 # Determine if any problem instance is offline

@@ -1,26 +1,75 @@
 ---
 # Playbook that installs and configures picoCTF-web servers
 
+- include: ../common/tasks/sync_source.yml
+  tags:
+    - web
+    - sync
+    - web-api
+    - web-static
+    - web-both
+
 - include: dependencies.yml
-  tags: dependency
+  tags:
+    - web 
+    - dependency
 
 - include_role:
     name: nginx
     apply:
       tags:
         - nginx
-  tags: nginx
+  tags:
+    - web 
+    - nginx
 
 - include: picoCTF-config.yml
+  tags:
+    - web 
 
 - include: picoCTF-api.yml
-  tags: web-api
+  tags:
+    - web
+    - web-api
+    - web-both
 
 - include: picoCTF-static.yml
-  tags: web-static
+  tags:
+    - web-static
+    - web-both
 
 - include: gunicorn.yml
+  tags:
+    - web 
 
 - include: daemons.yml
+  tags:
+    - web 
+
+- include: flush_database.yml
+  tags:
+    - never
+    - undeploy-one
+    - undeploy-section
+    - undeploy-all
+    - redeploy-one
+    - redeploy-section
+    - redeploy-all
+    - flush-and-reload-db
 
 - include: auto_configure.yml
+  tags:
+    - web 
+
+- include: backup_database.yml
+  tags:
+    - web
+    - backup-db
+
+# rebooting if required
+- import_role:
+    name: common
+    tasks_from: reboot
+  tags:
+    - web 
+    - dependency

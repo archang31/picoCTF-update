@@ -1,0 +1,46 @@
+---
+# development convenience to undeploy/redeploy a challenge
+# expects:
+#   slug        (e.g. docker-world-867a1ac)
+#   problem_dir (e.g. /picoCTF/problems/examples/on-demand/minimal/)
+# optional:
+#   deploy_number (defaults to 2)
+
+- name: Fail playbook if both problem_dir and slug undefined
+  fail:
+    msg: Problem directory (problem_dir) and unique name (slug) are undefined
+  when: (slug is undefined) and (problem_dir is undefined)
+
+- name: Getting problem unique name from ({{ problem_dir }}) when slug is undefined
+  command: "{{ virtualenv_dir }}/bin/shell_manager status -d {{ problems_base_dir }}/{{ problem_dir }}"
+  register: status_output
+  when: slug is undefined
+
+- name: Registered problem unique name from {{ problem_dir }} as slug
+  set_fact:
+    slug: "{{ status_output.stdout }}"
+  when: slug is undefined
+
+- name: Get slug from problem_dir if slug is undefined
+  set_fact:
+    slug: "{{ status_output.stdout }}"
+  when: slug is undefined
+
+- name: Check to see if {{ slug }} installed (does not matter if deployed)
+  shell:
+    cmd: |
+      shell_manager status | grep "{{ slug }}" | awk -F'[()]' '{print $2}'
+  register: installed_problem
+
+- name: Notify that nothing was undeployed/uninstalled if the slug is not installed
+  debug:
+    msg: Problem {{ slug }} is not installed
+  when: installed_problem.stdout_lines|length == 0
+
+- name: Undeploy existing problem ({{ slug }})
+  command: "shell_manager undeploy -n {{deploy_number}} {{ slug }}"
+  when: installed_problem.stdout_lines|length != 0
+
+- name: Uninstall existing problem
+  command: "shell_manager uninstall {{ slug }}"
+  when: installed_problem.stdout_lines|length != 0

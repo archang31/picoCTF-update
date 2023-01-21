@@ -23,9 +23,17 @@ Some common tags:
 - `web`: full installation and configuration of the picoCTF-web stack
   - `web-api`: minimal update of just the API
   - `web-static`: minimal update of just the static web resources
+  - `web-both`: minimal update of just the static web resources and API
+  - `backup-db`: saves a backup of the complete database in `fetched/database_backups/` named by year/month (will overwrite).
+  - `flush-and-reload-db`: flushes problem database and reloads from shell
 - `shell`: full installation and configuration of the picoCTF-web stack
   - `shell-api`: minimal update of just `shell_manager`/`hacksport`
   - `deploy-all`: install and deploy all configured challenges
+  - `deploy-one`: install and deploy a single challenge. Must specify a `problem_dir`.
+  - `undeploy-all`: undeploy and uninstall all configured (deployed) challenges and flushes database (removes all bundles and problems)
+  - `undeploy-one`: undeploy and uninstall a single challenge. Must specify a `problem_dir` or a `slug`.
+  - `redeploy-all`: runs `undeploy-all` and then `deploy-all`
+  - `redeploy-one`: runs `undeploy-one` and then `deploy-one`. Must specify a `problem_dir`.
 - `nginx`: update the nginx configuration including HTTPS state
 
 ## Tags + Playbooks

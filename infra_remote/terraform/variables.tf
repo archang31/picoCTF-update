@@ -9,19 +9,21 @@ locals {
 
   # CTF: if you make a copy of this configuration be sure to change this
   # value so that your infrastructures are distinct
-  ctf = "picoCTF"
+  ctf = "cyberlab"
 
   # AWS Settings: choose best for where your CTF is
   region                  = "us-east-1"
   profile                 = "picoCTF"
-  shared_credentials_file = "~/.aws/credentials"
+  shared_credentials_files = ["~/.aws/credentials"]
 
   # SSH Settings: local path to key that will be authorized on the machines
   public_key_path = "~/.ssh/picoCTF_production_rsa.pub"
 
   # Machine Instance Type
   web_instance_type   = "t2.micro"
-  shell_instance_type = "t2.micro"
+  web_volume_size       = "15"
+  shell_instance_type   = "t2.micro"
+  shell_volume_size     = "15"
 }
 
 ###
@@ -45,10 +47,10 @@ locals {
   shell_private_ip = "10.0.1.20"
 
   # EBS Volumes: NOTE changing the instance type may require changing the device_name
-  db_ebs_data_size        = "10"
+  db_ebs_data_size        = "20"
   db_ebs_data_device_name = "/dev/xvdf"
 
-  # Tags that allow visibility via AWS Consolse
+  # Tags that allow visibility via AWS Console
   default_tags = {
     Environment = "production"
     Group       = "picoCTF"
@@ -59,7 +61,6 @@ locals {
   web_name   = "picoCTF-web"
   shell_name = "picoCTF-shell"
   db_name    = "picoCTF-db"
-
 }
 
 ###

@@ -19,7 +19,7 @@ terraform {
 provider "aws" {
   region  = local.region
   profile = local.profile
-  shared_credentials_file = local.shared_credentials_file
+  shared_credentials_files = local.shared_credentials_files
 }
 
 
@@ -87,6 +87,10 @@ resource "aws_instance" "web" {
     instance_type     = local.web_instance_type
     availability_zone = local.az
 
+    root_block_device {
+      volume_size = local.web_volume_size
+    }
+
     # Network settings
     vpc_security_group_ids = [aws_security_group.web.id]
     subnet_id              = aws_subnet.public.id
@@ -94,7 +98,7 @@ resource "aws_instance" "web" {
   
     # metadata
     key_name = aws_key_pair.auth.id
-    tags     = merge(local.default_tags, map("Name", local.web_name))
+    tags     = merge(local.default_tags, tomap({"Name"=local.web_name}))
 }
 
 resource "aws_instance" "shell" {
@@ -104,6 +108,10 @@ resource "aws_instance" "shell" {
     instance_type     = local.shell_instance_type
     availability_zone = local.az
 
+    root_block_device {
+      volume_size = local.shell_volume_size
+    }
+
     # Network settings
     vpc_security_group_ids = [aws_security_group.shell.id]
     subnet_id              = aws_subnet.public.id
@@ -111,7 +119,7 @@ resource "aws_instance" "shell" {
 
     # metadata
     key_name = aws_key_pair.auth.id
-    tags     = merge(local.default_tags, map("Name", local.shell_name))
+    tags     = merge(local.default_tags, tomap({"Name"=local.shell_name}))
 }
 
 
@@ -125,14 +133,14 @@ resource "aws_instance" "shell" {
 resource "aws_eip" "web" {
     instance = aws_instance.web.id
     vpc      = true
-    tags     = merge(local.default_tags, map("Name", local.web_name))
+    tags     = merge(local.default_tags, tomap({"Name"=local.web_name}))
 }
 
 # Create Elastic IP for shell server
 resource "aws_eip" "shell" {
     instance = aws_instance.shell.id
     vpc      = true
-    tags     = merge(local.default_tags, map("Name", local.shell_name))
+    tags     = merge(local.default_tags, tomap({"Name"=local.shell_name}))
 }
 
 
@@ -148,7 +156,7 @@ resource "aws_eip" "shell" {
 resource "aws_ebs_volume" "db_data_journal" {
     availability_zone = local.az
     size              = local.db_ebs_data_size
-    tags              = merge(local.default_tags, map("Name", local.db_name))
+    tags              = merge(local.default_tags, tomap({"Name"=local.db_name}))
 }
 
 # Attach data and journal volume to the instance running the database

@@ -1,14 +1,30 @@
 ---
 # Playbook that installs and configures picoCTF-shell servers
 
+- include: ../common/tasks/sync_source.yml
+  tags:
+    - shell
+    - sync
+    - shell-api
+    - deploy-one
+    - deploy-section
+    - deploy-all
+    - redeploy-one
+    - redeploy-all
+    - redeploy-section
+
 - include: dependencies.yml
   tags:
+    - shell
     - dependency
 
 - include: shell_manager-config.yml
+  tags:
+    - shell
 
 - include: shell_manager.yml
   tags:
+    - shell
     - shell-api
 
 - include_role:
@@ -16,17 +32,60 @@
     apply:
       tags:
         - nginx
-  tags: nginx
+  tags:
+    - shell
+    - nginx
 
 - include: pam_and_services.yml
-
-- include: deploy_problems.yml
   tags:
-    - deploy-all
+    - shell
 
-- include: redeploy_single_challenge.yml
+# handle challenges based on tags
+- include: challenges_undeploy_all.yml
   tags:
+    - never
+    - undeploy-all
+    - redeploy-all
+
+- include: challenges_undeploy_one.yml
+  tags:
+    - never
+    - undeploy-one
     - redeploy-one
-  when: slug is defined and problem_dir is defined
+
+- include: challenges_undeploy_section.yml
+  tags:
+    - never
+    - redeploy-section
+    - undeploy-section
+
+- include: challenges_deploy_one.yml
+  tags:
+    - never
+    - deploy-one
+    - redeploy-one
+
+- include: challenges_deploy_section.yml
+  tags:
+    - never
+    - deploy-section
+    - redeploy-section
+
+# always do this one by default
+- include: challenges_deploy_all.yml
+  tags:
+    - shell
+    - deploy-all
+    - redeploy-all
 
 - include: permissions.yml
+  tags:
+    - shell
+
+# rebooting if required
+- import_role:
+    name: common
+    tasks_from: reboot
+  tags:
+    - shell
+    - dependency

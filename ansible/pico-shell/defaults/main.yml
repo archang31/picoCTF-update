@@ -3,8 +3,16 @@
 # and can easily be overridden in group_vars, host_vars, or the command line.
 
 pico_base_dir     : "/picoCTF"
-shell_manager_dir :  "{{pico_base_dir}}/picoCTF-shell"
+shell_manager     : "picoCTF-shell"
+problems_base     : "problems"
+shell_manager_dir : "{{ pico_base_dir }}/{{ shell_manager }}"
+problems_base_dir : "{{ pico_base_dir }}/{{ problems_base }}"
 virtualenv_dir    : "/picoCTF-env"
+# list of folders to copy (synchronize) on this host
+sync_directories  :
+  - "{{ shell_manager }}"
+  - "{{ problems_base }}"
+
 
 ###
 # wetty configuration
@@ -32,18 +40,18 @@ web_address_internal_https : "https://{{ hostvars['web']['ansible_host'] }}"
 ##
 problem_source_dirs: "{% if enable_docker %}{{ std_src_dirs + docker_src_dirs }}{% else %}{{std_src_dirs}}{% endif %}"
 std_src_dirs:
-  - "{{ pico_base_dir }}/problems/examples/binary-exploitation/buffer-overflow-1"
-  - "{{ pico_base_dir }}/problems/examples/cryptography/ecb-1"
-  - "{{ pico_base_dir }}/problems/examples/web-exploitation/sql-injection-1"
+  - "{{ problems_base_dir }}/examples/binary-exploitation/buffer-overflow-1"
+  - "{{ problems_base_dir }}/examples/cryptography/ecb-1"
+  - "{{ problems_base_dir }}/examples/web-exploitation/sql-injection-1"
 docker_src_dirs:
-  - "{{ pico_base_dir }}/problems/examples/on-demand"
+  - "{{ problems_base_dir }}/examples/on-demand"
 
 
 bundles: "{% if enable_docker %}{{ std_bundles + docker_bundles }}{% else %}{{std_bundles}}{% endif %}"
 std_bundles:
-  - "{{ pico_base_dir }}/problems/bundles/challenge-sampler.json"
+  - "{{ problems_base_dir }}/bundles/challenge-sampler.json"
 docker_bundles:
-  - "{{ pico_base_dir }}/problems/bundles/on-demand.json"
+  - "{{ problems_base_dir }}/bundles/on-demand.json"
 
 
 # SSL with Let's Encrypt

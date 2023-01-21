@@ -48,14 +48,44 @@ server {
 
         # allows direct requests from the shell_server
         allow {{ pico_internal_allow }};
+        allow {{ shell_external_ip }};
         deny all;
 
         # http basic auth
         auth_basic "Restricted";
         auth_basic_user_file /etc/nginx/.htpasswd;
+
+        # add rule to allow letsencrypt cert renewals
+        # Rule for legitimate ACME Challenge requests (like /.well-known/acme-challenge/xxxxxxxxx)
+        location ^~ /.well-known/acme-challenge/ {
+            # No HTTP authentication
+            allow all;
+            auth_basic off;
+
+            # Set correct content type. According to this:
+            # https://community.letsencrypt.org/t/using-the-webroot-domain-verification-method/1445/29
+            # Current specification requires "text/plain" or no content header at all.
+            # It seems that "text/plain" is a safe option.
+            default_type "text/plain";
+        }
+
+        # Hide /acme-challenge subdirectory and return 404 on all requests.
+        # It is somewhat more secure than letting Nginx return 403.
+        # Ending slash is important!
+        location = /.well-known/acme-challenge/ {
+            return 404;
+        }
+
         {% endif %}
 
-        location ~* \.(js|css)$ {
+        location ~* \.(js)$ {
+            expires 1y;
+            add_header Cache-Control "public";
+        }
+
+        location ~* \.(css)$ {
+            auth_basic off;
+            allow all; # Allow all to see content
             expires 1y;
             add_header Cache-Control "public";
         }
@@ -63,6 +93,15 @@ server {
         location = / {
             default_type text/html;
             index  index.html;
+            auth_basic off;
+            allow all; # Allow all to see content
+        }
+
+        location ~ ^/(index)(\.html)?$ {
+          auth_basic off;
+          allow all; # Allow all to see content
+          default_type text/html;
+          alias {{ pico_http_dir }}/$1.html;
         }
 
         location ~ /api/ {

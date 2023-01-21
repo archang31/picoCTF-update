@@ -1,19 +1,19 @@
-
 # Local development environments are the only place the platform should
 # be loaded in directly via filesystem sync without being cloned from a
 # specific source and branch
-- include: clone_repo.yml
-  when: "'git' in sync_mode" # coule be git or git_private
+#- include: clone_repo.yml
+#  when: "'git' in sync_mode" # coule be git or git_private
 
 # Source should be synchronized over from a local directory on the control machine
 - name: Synchronize picoCTF source code
   synchronize:
-    src: "{{pico_src_dir}}"
-    dest: "{{pico_base_dir}}"
+    src: "{{pico_src_dir}}/{{ item }}"
+    dest: "{{pico_base_dir}}/"
     archive: no
     recursive: yes
     delete: yes
-  when: "'source' in sync_mode"
+  when: ('source' in sync_mode) and (sync_directories|length != 0)
+  with_items: "{{ sync_directories }}"
 
 - name: Ensure admin user owns picoCTF directory
   file:

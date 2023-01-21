@@ -11,11 +11,22 @@
 
 - include: set_hostname.yml
 
-- include: sync_source.yml
+# moved into individual roles
+#- include: sync_source.yml
+#  tags:
+#    - sync
+#    - web-api
+#    - web-static
+#    - web-both
+#    - shell-api
+#    - deploy-one
+#    - deploy-section
+#    - deploy-all
+#    - redeploy-one
+#    - redeploy-all
+#    - redeploy-section
+
+- include: util_admin_ssh_keys.yml
   tags:
-    - sync
-    - web-api
-    - web-static
-    - shell-api
-    - deploy-all
-    - redeploy-one
+    - never
+    - update_admin_keys

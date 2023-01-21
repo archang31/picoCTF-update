@@ -5,7 +5,7 @@
 
 - name: Set up authorized keys
   authorized_key:
-    user: "{{ admin_user }}"
+    user: "{{ ansible_user }}"
     state: present
     key: "{{ item }}"
   with_file: "{{ admin_keys }}"

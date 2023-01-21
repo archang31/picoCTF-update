@@ -26,6 +26,8 @@ vault_web_admin_pw                    : "{web_pw}"
 # web API
 vault_flask_app_secret_key            : "{flask_secret}"
 vault_flask_app_rate_limit_bypass_key : "{bypass_key}"
+vault_reCAPTCHA_private_key           : "<TO BE UPDATED>"
+vault_email_password                  : "<TO BE UPDATED>"
 
 # shell
 vault_shell_manager_deploy_secret     : "{deploy_secret}"

@@ -1,4 +1,3 @@
-
 key_dir     : "/etc/docker/keys"
 
 socket_host : "-H unix:///var/run/docker.sock"
@@ -14,8 +13,11 @@ srv_key     : "{{ key_dir }}/server-key.pem"
 srv_csr     : "{{ key_dir }}/server.csr"
 srv_crt     : "{{ key_dir }}/server.pem"
 server_CN   : "{{ ansible_host }}"
-server_SAN  : "DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1,{{ host_type }}:{{ ansible_host }}"
+server_SAN  : "DNS:localhost,IP:127.0.0.1,{{ host_type }}:{{ ansible_host }}"
 
 user        : "{{ ansible_user }}"
 
 docker_clients : ["{{ hostvars['web']['ansible_host'] }}"]
+
+# list of folders to copy (synchronize) on this host
+# sync_directories : []

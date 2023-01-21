@@ -1,0 +1,10 @@
+---
+# Playbook that removes exisiting problems and bundles from the database
+
+- name: Flushing (removing) existing problems from database
+  shell: |
+    mongo {{ db_name }} --eval "db.auth('{{ mongodb_web_user }}','{{ picoWeb_db_password }}');db.problems.remove({});"
+
+- name: Flushing (removing) existing bundles from database
+  shell: |
+    mongo {{ db_name }} --eval "db.auth('{{ mongodb_web_user }}','{{ picoWeb_db_password }}');db.bundles.remove({});"

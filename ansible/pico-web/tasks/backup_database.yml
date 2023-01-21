@@ -1,0 +1,29 @@
+---
+# Playbook that removes exisiting problems and bundles from the database
+
+- name: Create backup of entire database
+  shell: |
+    mongodump --db {{ db_name }} --username {{ mongodb_web_user }} --password {{ picoWeb_db_password }} --out /home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}
+
+- name: Archive the database backup
+  archive:
+    path: "/home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}/{{ db_name }}"
+    dest: "/home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}.tar.gz"
+    format: gz
+    remove: yes
+
+- name: Copy backup archive to local backup directory
+  fetch:
+    src: "/home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}.tar.gz"
+    dest: "fetched/database_backups/"
+    flat: yes
+
+- name: Delete remote copy of backup.tar.gz
+  file:
+    path: "/home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}.tar.gz"
+    state: absent
+
+- name: Delete remote copy backup directory
+  file:
+    path: "/home/{{ ansible_user }}/{{ db_name }}-{{ lookup('pipe','date +%Y-%m') }}"
+    state: absent

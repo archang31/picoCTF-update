@@ -152,7 +152,7 @@ class HTTP():
         self.link_text = link_text
 
     def dict(self):
-        url = "http://{host}:{{port}}" + self.path
+        url = "http://{host}:{{port}}/" + self.path
         if self.link_text == "":
             link = "<a href='{}' target='_blank'>{}</a>".format(url, url)
         else:

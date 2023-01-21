@@ -153,6 +153,42 @@ class Challenge(metaclass=ABCMeta):
 
         return {"Type": "oneshot", "ExecStart": "/bin/bash -c 'echo started'"}
 
+    def std_flag_format(self, prefix="CTF", msg=None, numrand=6, fmt="{prefix}{{{body}}}"):
+        """
+        Utility function to generate a flag in a standardized format
+        Args:
+            prefix  : start of flag (should be ~3 characters)
+            msg     : actual flag message
+            numrand : number of random hex characters to include
+            fmt     : how you want flag to be formatted with fields (prefix, body)
+        """
+
+        size = max(numrand, 32)
+        token = "".join([self.random.choice("0123456789ABCDEF") for i in range(size)])
+
+        if msg is None:
+            msg = token
+            return fmt.format(prefix=prefix, body=msg)
+
+        if numrand <= 0:
+            return fmt.format(prefix=prefix, body=msg)
+
+        body = msg + "_" + token[:numrand]
+        return fmt.format(prefix=prefix, body=body)
+
+    def std_flag_encode(self, flag=None, rot=1):
+        """
+        Very Basic C ofuscation function
+        Args:
+            s       : string
+            rot     : rotation amount
+        """
+        if flag == None:
+            flag = self.flag
+        chars = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+        trans = chars[rot:]+chars[:rot]
+        rot_char = lambda c: trans[chars.find(c)] if chars.find(c)>-1 else c
+        return ''.join( rot_char(c) for c in flag )
 
 class Compiled(Challenge):
     """
@@ -346,6 +382,6 @@ class PHPApp(WebService):
         """
 
         web_root = join(self.directory, self.php_root)
-        self.start_cmd = "uwsgi --protocol=http --plugin php -p {1} --force-cwd {0} --php-allowed-docroot {2} --http-socket-modifier1 14 --php-index index.html --php-index index.php --check-static {0} --static-skip-ext php --logto /dev/null --php-allowed-ext .php --php-allowed-ext .inc".format(
+        self.start_cmd = "uwsgi --protocol=http --plugin php -p {1} --force-cwd {0} --php-allowed-docroot {2} --http-socket-modifier1 14 --php-index index.html --php-index index.php --check-static {0} --static-skip-ext php --logto /dev/null".format(
             web_root, self.num_workers, self.directory
         )

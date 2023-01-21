@@ -12,9 +12,11 @@ all:
     shell:
       hostname     : "picoCTF-shell-PROD"
       ansible_host : "shell.example.com"   # UPDATE: with fully qualified domain name
+      # Shell_Elastic_IP_address = "X.X.X.X"
     web:
       hostname     : "picoCTF-web-PROD"
       ansible_host : "ctf.example.com"     # UPDATE: with fully qualified domain name
+      # Web_Elastic_IP_address = "X.X.X.X"
 
   vars:
       # UPDATE: this is the default key specified in terraform/variables.tf
@@ -58,7 +60,11 @@ all:
       auto_add_shell         : True
       auto_load_problems     : True
       auto_start_ctf         : True
+      auto_add_management_settings  : True
+
+      # Docker challenge support
       enable_docker          : True
+      docker_ttl             : 3600  # 1 hour = 60 * 60 = 3600
 
       ## HTTPS:
       # You can automatically obtain free SSL/TLS certificates from Let's
@@ -75,6 +81,13 @@ all:
       # https://letsencrypt.org/docs/rate-limits/
       # https://letsencrypt.org/docs/staging-environment/
       certbot_staging: False
+
+      # HTTP Basic Auth
+      enable_basic_auth           : False
+      #htpasswd_accounts           : []
+      htpasswd_accounts           : "{{ vault_htpasswd_accounts }}"
+      # this is needed to add the rule to the nginx server on web... should find a better way
+      shell_external_ip           : "1.2.3.4"
 
       # Set whether `ansible_host` is an IP address or a domain name (DNS) In a
       # production environment we recommend DNS so that you can easily use SSL/TLS
@@ -107,6 +120,9 @@ all:
       # web
       flask_app_secret_key            : "{{ vault_flask_app_secret_key }}"
       flask_app_rate_limit_bypass_key : "{{ vault_flask_app_rate_limit_bypass_key }}"
+      web_admin                       : "admin"
+      web_admin_first                 : "First"
+      web_admin_last                  : "Last"
       web_admin_pw                    : "{{ vault_web_admin_pw }}"
 
       # shell
@@ -122,3 +138,48 @@ all:
 
       # Additional non-credential settings
       net_outbound_limit              : "40mbit"      # Prevent script kiddies from using as DOS box
+
+      ## Problems
+      deploy_number           : 2
+      problem_base_dir        : "{{pico_base_dir}}/problems"
+      problem_source_dirs:
+        - "{{ pico_base_dir }}/problems/examples/"
+
+      bundles:
+        - "{{ pico_base_dir }}/problems/bundles/challenge-sampler.json"
+        - "{{ pico_base_dir }}/problems/bundles/ond-demand.json"
+
+      ###
+      # General Settings.
+      # the following settings are used to configure email
+      ###
+      competition_name: "PicoCTF Upgrade"
+      competition_url: "https://ctf.example.com/"
+      max_team_size: 0
+
+      ###
+      # Email Settings.
+      # the following settings are used to configure email
+      ###
+      enable_email: True
+      email_verification: True
+      parent_verification_email: False
+      smtp_url: "smtp.gmail.com"
+      smtp_port: 587
+      email_username: "admin@example.com"
+      # don't forget to modify vault_email_password
+      email_password: "{{ vault_email_password }}"
+      email_from_addr: "admin@example.com"
+      email_from_name: "PicoCTF Upgrade"
+      max_verification_emails: 3
+      smtp_security: "TLS"
+
+      ###
+      # Captcha Settings.
+      # the following settings are used to configure captcha
+      ###
+      enable_captcha: True
+      captcha_url: "https://www.google.com/recaptcha/api/siteverify"
+      reCAPTCHA_public_key: "6LeXXXXXXXXXXXXXXXXX"
+      # don't forget to modify vault_reCAPTCHA_private_key
+      reCAPTCHA_private_key: "{{ vault_reCAPTCHA_private_key }}"

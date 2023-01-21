@@ -39,3 +39,8 @@
   loop_control:
     loop_var: client
   tags: ["docker", "docker-client"]
+
+# rebooting if required
+- import_role:
+    name: common
+    tasks_from: reboot

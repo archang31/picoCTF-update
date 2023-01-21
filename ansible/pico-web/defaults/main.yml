@@ -2,10 +2,16 @@
 # Defaults for the picoCTF-web role. These are the lowest priority variables
 # and can easily be overridden in group_vars, host_vars, or command line
 
-pico_base_dir  : "/picoCTF"
-web_code_dir   : "{{pico_base_dir}}/picoCTF-web"
-scripts_dir    : "{{pico_base_dir}}/scripts"
-virtualenv_dir : "/picoCTF-env"
+pico_base_dir    : "/picoCTF"
+web_code         : "picoCTF-web"
+scripts          : "scripts"
+web_code_dir     : "{{pico_base_dir}}/{{ web_code }}"
+scripts_dir      : "{{pico_base_dir}}/{{ scripts }}"
+virtualenv_dir   : "/picoCTF-env"
+# list of folders to copy (synchronize) on this host
+sync_directories :
+  - "{{ web_code }}"
+  - "{{ scripts }}"
 
 ###
 # picoCTF-web and API configuration
@@ -74,6 +80,8 @@ shell_proto         : "{% if enable_certbot %}HTTPS{% else %}HTTP{% endif %}"
 
 # HTTP Basic Auth
 enable_basic_auth: false
+# this will not work but just leaving so does not break on default install
+shell_external_ip: "{{ pico_internal_allow }}"
 htpasswd_accounts: []
 
 # SSL with Let's Encrypt

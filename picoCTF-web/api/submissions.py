@@ -191,7 +191,13 @@ def get_suspicious_submissions(tid):
     """Get the suspicious submissions for a given team."""
     submissions = get_submissions(tid=tid, suspicious=True)
     for submission in submissions:
-        submission["problem_name"] = api.problem.get_problem(submission["pid"])["name"]
+        problem = api.problem.get_problem(submission["pid"])
+        # Old. Changing since some problems might no longer exist
+        # submission["problem_name"] = api.problem.get_problem(submission["pid"])["name"]
+        if problem is not None:
+            submission["problem_name"] = problem["name"]
+        else:
+            submission["problem_name"] = None
     return submissions
 
 
